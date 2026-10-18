@@ -1,0 +1,11 @@
+# Vercel CLI uploads the working directory as-is; skip local build output and
+# the raw source photos (only their generated versions are used at runtime).
+node_modules
+.next
+.next-prod
+*.tsbuildinfo
+public/maaz-raw.png
+public/avatar-raw.jpg
+.env*.local
+.vercel
+PRIVATE-NOTES.md

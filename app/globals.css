@@ -1,0 +1,318 @@
+@import "tailwindcss";
+
+/* ============================================================
+   Design tokens. Accent scale is derived from the page gradient
+   (sky-400 -> indigo-500) so the dark stage and the bright sections share one palette.
+   ============================================================ */
+@theme {
+  /* Dark stage, tinted toward indigo rather than teal so it sits under the
+     sky→indigo page gradient instead of fighting it. */
+  --color-base: #070914;
+  --color-surface: #0c101f;
+  --color-surface-2: #121729;
+  --color-line: #1e2440;
+  --color-line-bright: #2f3861;
+
+  --color-ink: #eaeefb;
+  --color-ink-dim: #a8b2d4;
+  --color-ink-faint: #6f7aa0;
+
+  /* Accent scale pulled from the page gradient: sky-400 → indigo-500.
+     The previous mint (#35d6c3) read as green against the new theme. */
+  --color-accent: #38bdf8;
+  --color-accent-deep: #6366f1;
+  --color-accent-shadow: #4f46e5;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono-face), ui-monospace, "Cascadia Code", monospace;
+
+  --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ---------- base ---------- */
+html {
+  scroll-behavior: smooth;
+  /* Reserve the scrollbar's space even while the intro loader locks
+     scrolling, so its appearance doesn't shove the page sideways (that one
+     shift alone measured 0.1 CLS on desktop). */
+  scrollbar-gutter: stable;
+  /* stop iOS from inflating type in landscape */
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  /* Dark everywhere, with the sky→indigo palette as light rather than paint.
+     The page used to run on a bright sky→indigo gradient, but white text on
+     its sky end measured ~2.8:1 contrast (AA needs 4.5:1) and the dark 3D
+     stage read as a different site dropped into the middle. Sections are
+     transparent and let these glows through; `fixed` keeps them stable
+     instead of re-running per section. */
+  background-color: var(--color-base);
+  background-image:
+    radial-gradient(60rem 40rem at 88% -8%, rgb(99 102 241 / 0.2), transparent 62%),
+    radial-gradient(48rem 34rem at -12% 38%, rgb(56 189 248 / 0.12), transparent 62%),
+    radial-gradient(64rem 40rem at 50% 112%, rgb(79 70 229 / 0.18), transparent 62%);
+  background-attachment: fixed;
+  color: #ffffff;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  /* Clip, don't hide: `overflow-x: hidden` makes overflow-y compute to `auto`,
+     which turns <body> into the scroll container and breaks window.scrollY —
+     and with it any scroll-progress maths. `clip` has no such side effect. */
+  overflow-x: clip;
+}
+
+::selection {
+  background: var(--color-accent);
+  color: var(--color-base);
+}
+
+/* ---------- scrollbar ----------
+   Two declarations because support is split: Firefox only understands the
+   standard `scrollbar-*` properties, Chrome/Safari only the ::-webkit- ones.
+   Both are needed for consistent theming across browsers. */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-accent-deep) rgba(255, 255, 255, 0.08);
+}
+
+::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(7, 9, 20, 0.35);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #38bdf8 0%, #6366f1 100%);
+  border-radius: 999px;
+  /* Transparent border + background-clip insets the thumb, so it reads as a
+     floating pill rather than filling the gutter edge to edge. */
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #7dd3fc 0%, #818cf8 100%);
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* visible focus for keyboard users, invisible for mouse users */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* ---------- reduced motion: a hard global off-switch ----------
+   Every animation on this site must respect it. Scroll-driven
+   effects also check this in JS via usePrefersReducedMotion.   */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ---------- component classes ----------
+   Plain CSS, not @utility: these are used as literal class names, never
+   composed with Tailwind variants, and @utility cannot be nested inside a
+   media query. Plain rules in this file are also never purged.           */
+
+.container-page {
+  width: 100%;
+  /* 88rem (1408px), not 72rem: on a 1920-2000px display a 1152px column left
+     ~400px of dead space on each side, which read as a narrow strip. */
+  max-width: 88rem;
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+}
+
+@media (min-width: 768px) {
+  .container-page {
+    padding-inline: 2rem;
+  }
+}
+
+@media (min-width: 1536px) {
+  .container-page {
+    padding-inline: 3rem;
+  }
+}
+
+/* subtle grid backdrop, used behind the hero */
+.grid-backdrop {
+  background-image:
+    linear-gradient(to right, var(--color-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--color-line) 1px, transparent 1px);
+  background-size: 64px 64px;
+  -webkit-mask-image: radial-gradient(
+    ellipse 80% 60% at 50% 40%,
+    #000 30%,
+    transparent 75%
+  );
+  mask-image: radial-gradient(
+    ellipse 80% 60% at 50% 40%,
+    #000 30%,
+    transparent 75%
+  );
+}
+
+/* ---------- animated hero gradient ----------
+   Driven by `transform`, not `background-position`. Animating background
+   position repaints the whole layer every frame; transform stays on the
+   compositor, so this costs effectively nothing.
+
+   The layers are oversized and offset so translation and rotation can never
+   expose an edge. The reduced-motion block above freezes them on their first
+   keyframe, leaving a clean static gradient. */
+@keyframes hero-drift-a {
+  0% {
+    transform: translate3d(-6%, -4%, 0) rotate(0deg) scale(1.08);
+  }
+  50% {
+    transform: translate3d(5%, 4%, 0) rotate(7deg) scale(1.18);
+  }
+  100% {
+    transform: translate3d(-6%, -4%, 0) rotate(0deg) scale(1.08);
+  }
+}
+
+@keyframes hero-drift-b {
+  0% {
+    transform: translate3d(4%, 3%, 0) rotate(0deg) scale(1.12);
+  }
+  50% {
+    transform: translate3d(-5%, -3%, 0) rotate(-9deg) scale(1.22);
+  }
+  100% {
+    transform: translate3d(4%, 3%, 0) rotate(0deg) scale(1.12);
+  }
+}
+
+.hero-gradient-a,
+.hero-gradient-b {
+  position: absolute;
+  top: -30%;
+  left: -30%;
+  width: 160%;
+  height: 160%;
+  will-change: transform;
+  pointer-events: none;
+}
+
+/* Deep end of the palette, so white copy on top clears 7:1 contrast. */
+.hero-gradient-a {
+  background: linear-gradient(
+    120deg,
+    #0b1b3f 0%,
+    #1e1b4b 42%,
+    #312e81 68%,
+    #0c3a5e 100%
+  );
+  animation: hero-drift-a 5s ease-in-out infinite;
+}
+
+/* Second layer at a different tempo so the two never resolve into an
+   obvious loop. Screen-blended to add light rather than muddy the base. */
+.hero-gradient-b {
+  background: radial-gradient(
+      ellipse 55% 45% at 30% 30%,
+      rgba(56, 189, 248, 0.32) 0%,
+      transparent 62%
+    ),
+    radial-gradient(
+      ellipse 50% 50% at 72% 68%,
+      rgba(129, 140, 248, 0.3) 0%,
+      transparent 60%
+    );
+  mix-blend-mode: screen;
+  animation: hero-drift-b 7s ease-in-out infinite;
+}
+
+/* ---------- intro loader ---------- */
+/* Set before first paint by the loader's inline script on repeat views. */
+.intro-seen #site-loader {
+  display: none;
+}
+
+@keyframes loader-orbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes loader-letter-in {
+  0% {
+    opacity: 0;
+    transform: translateY(115%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.loader-orbit {
+  animation: loader-orbit 14s linear infinite;
+}
+
+.loader-letter {
+  display: inline-block;
+  opacity: 0;
+  animation: loader-letter-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  /* a space collapses to zero width inside an inline-block */
+  min-width: 0.32em;
+}
+
+/* reveal-on-scroll: starts hidden, .is-visible added by the observer */
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 0.7s var(--ease-out-soft),
+    transform 0.7s var(--ease-out-soft);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Directional variants — entries alternate sides as they come in.
+   Declared after `.reveal.is-visible` so the reset still wins. */
+.reveal.from-left {
+  transform: translate3d(-44px, 20px, 0) scale(0.985);
+}
+
+.reveal.from-right {
+  transform: translate3d(44px, 20px, 0) scale(0.985);
+}
+
+.reveal.from-left.is-visible,
+.reveal.from-right.is-visible {
+  transform: none;
+}
+
+/* Motion-reduced users must still see everything, immediately. The <noscript>
+   block in the root layout covers the JS-disabled case. */
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+}

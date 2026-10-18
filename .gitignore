@@ -1,0 +1,28 @@
+node_modules/
+.next/
+out/
+build/
+
+# env
+.env
+.env*.local
+
+# vercel / ts
+.vercel
+*.tsbuildinfo
+next-env.d.ts
+
+# os
+.DS_Store
+Thumbs.db
+
+# 7.7MB source photo — only the generated portrait is needed at runtime
+public/maaz-raw.png
+public/avatar-raw.jpg
+.next-prod/
+
+.vercel
+.env*
+
+# private notes, never published
+PRIVATE-NOTES.md
