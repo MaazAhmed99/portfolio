@@ -40,7 +40,7 @@ export const profile = {
   ],
 
   bio: [
-    "Alongside freelance work, I lead the frontend of a multi-portal yacht club management ERP at Sibisoft. I own the architecture decisions, drove the performance work that cut load times by around 30%, and review code for the frontend team.",
+    "I lead the frontend of a multi-portal yacht club management ERP, where I own the architecture decisions, drove the performance work that cut load times by around 30%, and review code for the frontend team.",
     "Before that I spent five years across product and agency teams, building booking marketplaces, SaaS platforms and real-time social products. Most of it was React, with React Native for mobile and Node/Express when a job needed the backend too.",
     "What I care about most: an interface that stays fast on a mid-range phone, and code the next developer can pick up without calling me.",
   ],
